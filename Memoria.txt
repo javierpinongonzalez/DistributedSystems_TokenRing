@@ -1,0 +1,13 @@
+1:
+S'ha dissenyat un algoritme que simula un "token ring". Primer inicialitza els servidors 1 a 1, començant pel primer, inicialitza un ServerSocket i el deixa escoltant, seguidament inicialitza el segón, que primer es connecta al ServerSocket del servidor anterior i inicialitza un altre ServerSocket pel següent. Finalment quan l'últim ha acabat, el primer servidor es connecta al socket d'aquest.
+Un cop finalitzada la inicialització es comença a iterar, tot i que abans el primer servidor crea el token amb el següent format: "token-0" inicialitzant el valor de la variable que es vol compartir a 0. Tota la resta de servidors es queden escoltant el buffer d'entrada del socket del servidor previ, quan reben una trama que comença amb la paraula reservada: "token" separen el valor de la cadena i el tracten, actualitzant el valor o només llegint-lo, depenent si el servidor és de lectura o escriptura. Un cop tractat el valor s'envia una trama al següent servidor en el format vist anteriorment. Això es repeteix fins que tots els servidors hagin acabat de fer les 10 iteracions.
+Un cop els servidors han finalitzat es tanquen els buffers de lectura i escriptura, així com els sockets de cadascun.
+
+2:
+La limitació més gran és el temps d'execució, el "token ring" és un mètode molt robust pel que fa a consistència de les dades, però a l'hora d'enfocar en el rendiment és subòptim.
+
+3:
+El rendiment en temps d'execució augmenta considerablement, tot i que ho fa de manera lineal. Per altra banda, serà molt difícil que al final de l'execució no obtinguem el valor esperat, ja que al fer-ho d'una manera tan ordenada poc més que un error a la xarxa o la caiguda d'un servidor podria impedir-nos la correcta execució de l'algorisme.
+
+4:
+Per poder afegir un nou servidor en meitat d'una execució, crearia una nova trama anomenada "novaConex". Un cop un node rep l'ordre que un nou node es vol unir hauria d'enviar una trama "novaConex" per tal d'informar el següent servidor que haurà de tancar el socket actual per fer lloc al nou. Un cop enviada la trama, el primer node tancarà el socket actual, crearà un ServerSocket al mateix port que l'anterior i el deixarà escoltant. Seguidament el nou node es connectarà a aquest i deixarà un ServerSocket escoltant pel segon servidor. Finalment aquest es connectarà al nou node i el funcionament de l'algorisme seguirà el seu curs.
