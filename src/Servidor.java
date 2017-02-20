@@ -7,7 +7,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-
+/*
+ *
+ * Classe que emula un servidor que implementa token ring
+ *
+ */
 public class Servidor extends Thread{
 
 	public int id;
@@ -24,6 +28,11 @@ public class Servidor extends Thread{
 	public BufferedReader nextIn;
 	public BufferedReader prevIn;
 	
+	/*
+ 	 *
+	 * Constructor sense paràmetres
+	 *
+	 */
 	public Servidor(){
 		id = -1;
 		rdonly = false;
@@ -31,6 +40,11 @@ public class Servidor extends Thread{
 		totalServers = 0;
 	}
 	
+	/*
+ 	 *
+	 * Constructor amb paràmetres
+	 *
+	 */
 	public Servidor(int id, boolean rdonly, int valor, int totalServers){
 		this.id = id;
 		this.rdonly = rdonly;
@@ -38,6 +52,11 @@ public class Servidor extends Thread{
 		this.totalServers = totalServers;
 	}
 	
+	/*
+ 	 *
+	 * Constructor el socket amb el servidor anterior al ring
+	 *
+	 */
 	public void configPrevSocket(){
 		try {
 			if (id == 1)
@@ -51,13 +70,17 @@ public class Servidor extends Thread{
 			prevIn = new BufferedReader(new InputStreamReader(prevSock.getInputStream())); 
 											
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+
+	/*
+ 	 *
+	 * Constructor el socket amb el servidor posterior al ring
+	 *
+	 */
 	public void configNextSock(){
 		try {
 			ServerSocket serverSock = new ServerSocket(8000+id);
@@ -67,14 +90,17 @@ public class Servidor extends Thread{
 			nextIn = new BufferedReader(new InputStreamReader(nextSocket.getInputStream()));
 			
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
+	/*
+ 	 *
+	 * Overwrite del métode Run de la classe Thread
+	 *
+	 */
 	public void run(){
 		
 		initConfig();
@@ -85,6 +111,12 @@ public class Servidor extends Thread{
 		System.out.println("Bye from thread num: "+id);
 	}
 	
+
+	/*
+ 	 *
+	 * Inicialitza els sockets
+	 *
+	 */
 	private void initConfig (){
 		System.out.println("Thread " + id + " starting");
 		if (id==1){
@@ -92,7 +124,6 @@ public class Servidor extends Thread{
 			try {
 				sleep(250*(totalServers+1));
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			configPrevSocket();
@@ -102,10 +133,20 @@ public class Servidor extends Thread{
 		}
 	}
 	
+	/*
+ 	 *
+	 * Envia el token al servidor posterior del ring
+	 *
+	 */
 	private void sendToken(int valor){
 		nextOut.println("token-"+valor);
 	}
 	
+	/*
+ 	 *
+	 * Espera a rebre el token del servidor anterior del ring
+	 *
+	 */
 	private String waitForToken(){
 		String inputStr;
 		String[] parts;
@@ -118,13 +159,17 @@ public class Servidor extends Thread{
 			
 			return inputStr;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		return null;
 	}
 	
+	/*
+ 	 *
+	 * Realitza les accions pertinents quan disposa del token
+	 *
+	 */
 	private void doIterations(){
 		String inputStr;
 		String[] parts;
@@ -150,7 +195,6 @@ public class Servidor extends Thread{
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
@@ -165,6 +209,11 @@ public class Servidor extends Thread{
 		sendToken(0);
 	}
 	
+	/*
+ 	 *
+	 * Tanca els sockets
+	 *
+	 */
 	private void closeConfig(){
 		try {
 			nextIn.close();
@@ -175,11 +224,15 @@ public class Servidor extends Thread{
 			prevSock.close();
 			nextSocket.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
+	/*
+ 	 *
+	 * Funció de debug
+	 *
+	 */
 	private void testPassingToken(){
 		String inputStr;
 		try {
@@ -188,7 +241,6 @@ public class Servidor extends Thread{
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				nextOut.println("Token");
@@ -199,13 +251,11 @@ public class Servidor extends Thread{
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				nextOut.println("Token");
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
